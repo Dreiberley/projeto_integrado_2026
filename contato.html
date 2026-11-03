@@ -90,21 +90,10 @@
             required></textarea>
     </div>
 
-    <!-- Configurações do envio -->
-    <input type="hidden"
-        name="_subject"
-        value="Nova mensagem - Projeto Prevenção">
-
-    <input type="hidden"
-        name="_template"
-        value="table">
-
-    <!-- Proteção contra spam -->
-    <input type="text"
-        name="_honey"
-        tabindex="-1"
-        autocomplete="off"
-        style="display:none">
+    <form id="form-contato"
+    class="formulario-contato"
+    action="contato.php"
+    method="POST">
 
     <button type="submit" class="botao-enviar">
         Enviar mensagem
