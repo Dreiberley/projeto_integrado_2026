@@ -997,3 +997,72 @@ a:focus-visible {
     border-radius: 6px;
     cursor: pointer;
 }
+
+
+
+/* FONTES.HTML */
+
+/* Cartões das fontes de pesquisa */
+.cards-lista {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.cards-lista li {
+    background-color: #fffde7;
+    border: 1px solid #fff59d;
+    border-left: 5px solid #fbc02d;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+}
+
+.cards-lista li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cards-lista li strong {
+    display: block;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.cards-lista li p {
+    color: #444444;
+    margin-bottom: 14px;
+}
+
+/* Links dentro dos cartões */
+.cards-lista li a {
+    display: inline-block;
+    background: linear-gradient(135deg, #fff176, #fbc02d);
+    color: #1c1c1c;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 7px;
+    transition: all 0.25s ease;
+}
+
+.cards-lista li a:hover {
+    background: #fbc02d;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .cards-lista li {
+        padding: 16px;
+    }
+
+    .cards-lista li a {
+        display: block;
+        text-align: center;
+    }
+}
