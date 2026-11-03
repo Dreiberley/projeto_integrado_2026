@@ -37,6 +37,45 @@
         </ul>
     </nav>
 
+ 
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contato - Prevenção ao Suicídio</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="interacoes.js" defer></script>
+</head>
+
+<body>
+
+    <!-- CABEÇALHO -->
+    <header>
+        <h1>FALE CONOSCO</h1>
+
+        <!-- BOTÃO DE ACESSIBILIDADE -->
+        <button type="button" id="botao-fonte"
+            aria-pressed="false">
+            Ampliar texto
+        </button>
+    </header>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Principal</a></li>
+            <li><a href="problema.html">Problemas</a></li>
+            <li><a href="combate.html">Combate</a></li>
+            <li><a href="impactos.html">Impactos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="fontes.html">Fontes</a></li>
+        </ul>
+    </nav>
+
     <!-- CONTEÚDO PRINCIPAL -->
     <main>
 
@@ -48,82 +87,77 @@
         </p>
 
         <p>
-            Sua mensagem será anonima, a não ser que vocẽ queira se identificar. Estamos aqui para ajudar.
+            Sua mensagem será anônima, a não ser que
+            você queira se identificar. Estamos aqui para ajudar.
         </p>
 
         <!-- FORMULÁRIO DE CONTATO -->
         <form id="form-contato"
-    class="formulario-contato"
-    action="https://formsubmit.co/ajax/SEU_EMAIL"
-    method="POST"
-    novalidate>
+            class="formulario-contato"
+            action="contato.php"
+            method="POST">
 
-    <div class="campo">
-        <label for="nome">Nome ou apelido:</label>
-        <input
-            type="text"
-            id="nome"
-            name="nome"
-            placeholder="Digite seu nome"
-            maxlength="80"
-            required>
-    </div>
+            <div class="campo">
+                <label for="nome">Nome ou apelido:</label>
 
-    <div class="campo">
-        <label for="email">E-mail:</label>
-        <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="seuemail@exemplo.com"
-            required>
-    </div>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    placeholder="Digite seu nome"
+                    maxlength="80"
+                    required>
+            </div>
 
-    <div class="campo">
-        <label for="mensagem">Sua mensagem:</label>
-        <textarea
-            id="mensagem"
-            name="mensagem"
-            rows="5"
-            maxlength="1000"
-            placeholder="Escreva sua mensagem"
-            required></textarea>
-    </div>
+            <div class="campo">
+                <label for="email">E-mail:</label>
 
-    <form id="form-contato"
-    class="formulario-contato"
-    action="contato.php"
-    method="POST">
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="seuemail@exemplo.com"
+                    required>
+            </div>
 
-    <button type="submit" class="botao-enviar">
-        Enviar mensagem
-    </button>
+            <div class="campo">
+                <label for="mensagem">Sua mensagem:</label>
 
-    <p
-        id="resultado-contato"
-        role="status"
-        aria-live="polite"></p>
+                <textarea
+                    id="mensagem"
+                    name="mensagem"
+                    rows="5"
+                    maxlength="1000"
+                    placeholder="Escreva sua mensagem"
+                    required></textarea>
+            </div>
 
-</form>
+            <!-- BOTÃO DE ENVIO -->
+            <button type="submit" class="botao-enviar">
+                Enviar mensagem
+            </button>
 
-            <!-- MENSAGENS DO JAVASCRIPT -->
+            <!-- RESULTADO DO ENVIO -->
             <p
                 id="resultado-contato"
                 role="status"
-                aria-live="polite"></p>
+                aria-live="polite">
+            </p>
 
         </form>
 
     </main>
 
+    <!-- BOTÃO DE DADOS E ESTATÍSTICAS -->
     <button type="button" id="abrir-dados"
         aria-expanded="false"
         aria-controls="painel-dados">
-    Dados e estatísticas
-</button>
 
-<div id="local-dados"></div>
+        Dados e estatísticas
 
+    </button>
+
+    <div id="local-dados"></div>
 
     <!-- RODAPÉ -->
     <footer>
