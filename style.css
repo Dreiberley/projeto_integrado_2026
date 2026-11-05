@@ -1420,10 +1420,13 @@ a:focus-visible {
     transition: background 0.3s, padding 0.3s;
 }
 
+
 #abrir-assistente:hover {
     background: #fbc02d;
-    padding-right: 17px;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.20);
+    padding: 18px 12px;
 }
+
 
 /* JANELA DO CHAT */
 
