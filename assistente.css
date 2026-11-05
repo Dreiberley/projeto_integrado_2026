@@ -1,14 +1,24 @@
 
-/* ABA LATERAL DO ACOLHE+ */
+/* =====================================
+   ACOLHE+ - ASSISTENTE VIRTUAL
+===================================== */
+
+/* BOTÃO LATERAL */
 
 #abrir-assistente {
     position: fixed;
 
-    left: 0;
     top: 50%;
-    transform: translateY(-50%) rotate(180deg);
+    left: 0;
+
+    right: auto;
+    bottom: auto;
+
+    transform: translateY(-50%);
 
     z-index: 11000;
+
+    padding: 18px 12px;
 
     background: linear-gradient(135deg, #fff176, #fbc02d);
     color: #1a1a1a;
@@ -18,91 +28,92 @@
 
     border-radius: 0 12px 12px 0;
 
-    padding: 22px 15px;
-
-    font-size: 17px;
+    font-size: 15px;
     font-weight: bold;
-
-    cursor: pointer;
 
     writing-mode: vertical-rl;
 
+    cursor: pointer;
+
     box-shadow: 3px 3px 10px rgba(0,0,0,0.15);
 
-    transition: 0.3s;
+    transition: background 0.3s, box-shadow 0.3s;
 }
+
+/* EFEITO AO PASSAR O MOUSE */
 
 #abrir-assistente:hover {
     background: #fbc02d;
-    padding-left: 20px;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.20);
 }
 
-/* JANELA DO CHAT NO MEIO DA LATERAL ESQUERDA */
+/* JANELA DO CHAT */
 
 #painel-assistente {
     position: fixed;
 
     top: 50%;
-    left: 75px;
+    left: 65px;
+
+    right: auto;
+    bottom: auto;
 
     transform: translateY(-50%);
 
     z-index: 11001;
 
-    width: min(450px, calc(100vw - 100px));
-    height: min(650px, calc(100vh - 40px));
+    width: 400px;
+    max-width: calc(100vw - 90px);
+
+    height: 580px;
+    max-height: calc(100vh - 40px);
 
     background: #ffffff;
 
     border: 2px solid #fbc02d;
-    border-radius: 18px;
+    border-radius: 15px;
 
     display: flex;
     flex-direction: column;
 
     overflow: hidden;
 
-    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.18);
 }
+
+/* ESCONDER PAINEL QUANDO FECHADO */
 
 #painel-assistente[hidden] {
     display: none;
 }
 
-/* CELULAR */
+/* MENSAGENS */
 
-@media (max-width: 600px) {
-
-    #abrir-assistente {
-        top: 50%;
-        padding: 18px 12px;
-        font-size: 15px;
-    }
-
-    #painel-assistente {
-        left: 55px;
-        width: calc(100vw - 70px);
-        height: min(650px, calc(100vh - 30px));
-    }
-
+#mensagens-assistente {
+    flex: 1;
+    overflow-y: auto;
 }
 
-/* AJUSTES COMPLEMENTARES */
+/* QUEBRA DE LINHA DAS MENSAGENS */
 
-/* Preserva as quebras de linha das mensagens */
 .mensagem {
     white-space: pre-line;
 }
 
-/* Aparência dos botões durante o envio */
-button:disabled,
-input[type="submit"]:disabled {
-    cursor: wait;
-    opacity: 0.65;
-}
+/* CELULARES */
 
-/* Resultado do formulário de contato */
-#resultado-contato {
-    margin-top: 12px;
-    font-weight: 650;
+@media (max-width: 600px) {
+
+    #abrir-assistente {
+        padding: 15px 10px;
+        font-size: 13px;
+    }
+
+    #painel-assistente {
+        left: 48px;
+        width: calc(100vw - 65px);
+        height: 540px;
+        max-height: calc(100vh - 30px);
+    }
+
 }
