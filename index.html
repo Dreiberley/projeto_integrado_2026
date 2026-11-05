@@ -7,6 +7,7 @@
     <title>PREVENÇÃO AO SUICÍDIO</title>
     <link rel="stylesheet" href="style.css">
     <script src="interacoes.js" defer> </script>
+    <script src="assistente.js" defer></script>
 
 </head>
 
@@ -33,14 +34,47 @@
     <a href="fontes.html">Fontes</a>
         </ul>
     </nav>
-    
-    <button id="abrir-assistente" type="button"
-        aria-label="Abrir assistente Acolhe+"
-        aria-expanded="false"
-        aria-controls="painel-assistente">
+
+  <button
+    id="abrir-assistente"
+    type="button"
+    aria-label="Abrir assistente Acolhe+"
+    aria-expanded="false"
+    aria-controls="painel-assistente">
+
     💛 Acolhe+
+
 </button>
 
+<div id="painel-assistente" hidden>
+
+    <button id="fechar-assistente" type="button">
+        ✖ Fechar
+    </button>
+
+    <h2>Acolhe+ 💛</h2>
+
+    <p>Olá! Sou o Acolhe+, seu assistente virtual.</p>
+
+    <div id="mensagens-assistente">
+        <div class="mensagem bot">
+            Olá! 💛 Como posso ajudar você hoje?
+        </div>
+    </div>
+
+    <form id="form-assistente">
+
+        <input
+            type="text"
+            id="entrada-assistente"
+            placeholder="Digite sua mensagem..."
+            required>
+
+        <button type="submit">Enviar</button>
+
+    </form>
+
+</div>
 
     <h2>Introdução</h2>
     <p>
