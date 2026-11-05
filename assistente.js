@@ -3,9 +3,32 @@
    ACOLHE+ 💛
    Assistente virtual de prevenção ao suicídio
    Projeto Web pela Convivência
+   Integração com Supabase
 ========================================== */
 
-// ELEMENTOS DO HTML
+// ==========================================
+// 1. CONEXÃO COM O SUPABASE
+// ==========================================
+
+const SUPABASE_URL = "https://ysblefnczwupjjkthgqc.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_QOuhlxo-Qis9S5OxkBh-2Q_t5xjeHEY";
+
+let banco = null;
+let conhecimentos = [];
+
+if (window.supabase) {
+    banco = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+} else {
+    console.error("Biblioteca do Supabase não foi carregada.");
+}
+
+// ==========================================
+// 2. ELEMENTOS DO HTML
+// ==========================================
 
 const abrir = document.getElementById("abrir-assistente");
 const fechar = document.getElementById("fechar-assistente");
@@ -15,22 +38,29 @@ const mensagens = document.getElementById("mensagens-assistente");
 const formulario = document.getElementById("form-assistente");
 const entrada = document.getElementById("entrada-assistente");
 
-// ABRIR O ASSISTENTE
+// ==========================================
+// 3. ABRIR E FECHAR O ASSISTENTE
+// ==========================================
 
-abrir.addEventListener("click", () => {
-    abrir.setAttribute("aria-expanded", "true");
-    entrada.focus();
-});
+if (abrir && painel && entrada) {
+    abrir.addEventListener("click", () => {
+        painel.hidden = false;
+        abrir.setAttribute("aria-expanded", "true");
+        entrada.focus();
+    });
+}
 
-// FECHAR O ASSISTENTE
+if (fechar && painel && abrir) {
+    fechar.addEventListener("click", () => {
+        painel.hidden = true;
+        abrir.setAttribute("aria-expanded", "false");
+        abrir.focus();
+    });
+}
 
-fechar.addEventListener("click", () => {
-    painel.hidden = true;
-    abrir.setAttribute("aria-expanded", "false");
-    abrir.focus();
-});
-
-// ADICIONAR MENSAGENS
+// ==========================================
+// 4. ADICIONAR MENSAGENS
+// ==========================================
 
 function adicionarMensagem(texto, tipo) {
 
@@ -44,7 +74,9 @@ function adicionarMensagem(texto, tipo) {
     mensagens.scrollTop = mensagens.scrollHeight;
 }
 
-// NORMALIZAR TEXTO
+// ==========================================
+// 5. NORMALIZAR TEXTO
+// ==========================================
 
 function normalizar(texto) {
 
@@ -52,17 +84,116 @@ function normalizar(texto) {
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s]/g, " ")
         .trim();
 }
 
-// IDENTIFICAR PALAVRAS
+// ==========================================
+// 6. IDENTIFICAR PALAVRAS
+// ==========================================
 
 function contem(texto, palavras) {
 
-    return palavras.some(palavra => texto.includes(palavra));
+    return palavras.some(palavra =>
+        texto.includes(normalizar(palavra))
+    );
 }
 
-// RESPOSTAS DO ACOLHE+
+// ==========================================
+// 7. CARREGAR CONHECIMENTOS DO BANCO
+// ==========================================
+
+async function carregarConhecimentos() {
+
+    if (!banco) return;
+
+    const { data, error } = await banco
+        .from("conhecimentos")
+        .select("categoria, pergunta, resposta")
+        .limit(100);
+
+    if (error) {
+        console.error("Erro ao carregar conhecimentos:", error);
+        return;
+    }
+
+    conhecimentos = data || [];
+
+    console.log(
+        "Conhecimentos carregados:",
+        conhecimentos.length
+    );
+}
+
+// ==========================================
+// 8. PESQUISAR NO BANCO DE DADOS
+// ==========================================
+
+async function buscarConhecimento(perguntaUsuario) {
+
+    if (!banco || conhecimentos.length === 0) {
+        return null;
+    }
+
+    const pergunta = normalizar(perguntaUsuario);
+
+    const ignorar = [
+        "como", "qual", "quais", "onde",
+        "quando", "porque", "para", "sobre",
+        "isso", "essa", "esse", "uma",
+        "que", "com", "dos", "das",
+        "estou", "quero", "voce"
+    ];
+
+    const palavras = pergunta
+        .split(/\s+/)
+        .filter(palavra =>
+            palavra.length >= 3 &&
+            !ignorar.includes(palavra)
+        );
+
+    if (palavras.length === 0) {
+        return null;
+    }
+
+    let melhorResultado = null;
+    let maiorPontuacao = 0;
+
+    conhecimentos.forEach(item => {
+
+        const textoBanco = normalizar(
+            `${item.pergunta} ${item.categoria}`
+        );
+
+        let pontuacao = 0;
+
+        palavras.forEach(palavra => {
+
+            if (textoBanco.includes(palavra)) {
+                pontuacao++;
+            }
+
+        });
+
+        if (pontuacao > maiorPontuacao) {
+
+            maiorPontuacao = pontuacao;
+            melhorResultado = item.resposta;
+
+        }
+
+    });
+
+    if (maiorPontuacao === 0) {
+        return null;
+    }
+
+    return melhorResultado;
+}
+
+// ==========================================
+// 9. RESPOSTAS PROGRAMADAS DO ACOLHE+
+// ==========================================
 
 function responder(pergunta) {
 
@@ -88,16 +219,19 @@ function responder(pergunta) {
 
     if (contem(texto, sinaisDeRisco)) {
 
-        return `💛 Obrigado por compartilhar o que está sentindo, amigo(a).
+        return `💛 Obrigado por compartilhar o que está sentindo.
 
 Sinto muito que você esteja passando por um momento tão difícil. Você merece ser ouvido(a), acolhido(a) e receber ajuda.
 
-Por favor, não enfrente isso sozinho(a).
-Procure
+Por favor, procure agora uma pessoa de confiança, como um familiar, professor ou responsável. Não fique sozinho(a) se estiver em perigo.
 
-Se puder, procure ajuda agora. Sua vida importa. 💛
+🚑 Em uma emergência, ligue 192 (SAMU) ou procure uma UPA ou pronto-socorro.
 
-Eu sou apenas um assistente educativo e não consigo oferecer atendimento de emergência.`;
+💛 CVV – 188: apoio emocional gratuito, disponível 24 horas.
+
+Se você estiver pensando em se machucar, procure ajuda presencial imediatamente.
+
+Eu sou um assistente educativo e não substituo atendimento profissional ou de emergência. Sua vida importa!`;
 
     }
 
@@ -112,7 +246,7 @@ Eu sou apenas um assistente educativo e não consigo oferecer atendimento de eme
 
         return `Olá! 💛 Seja bem-vindo(a) ao Acolhe+!
 
-Sou o assistente virtual do projeto Prevenção ao Suicídio do 2 TDS do colégio Dirce.
+Sou o assistente virtual do projeto Prevenção ao Suicídio do 2 TDS do Colégio Dirce.
 
 Estou aqui para compartilhar informações sobre saúde mental, prevenção e valorização da vida.
 
@@ -367,9 +501,64 @@ Obrigado por conhecer nosso projeto.
 Lembre-se de que pedir ajuda não é sinal de fraqueza. Você merece cuidado e acolhimento!`;
     }
 
-    // 14. RESPOSTA PADRÃO
+    // Nenhuma resposta programada encontrada
 
-    return `Ainda estou aprendendo a responder diferentes perguntas! 💛
+    return null;
+}
+
+// ==========================================
+// 10. ENVIAR MENSAGEM E CONSULTAR O BANCO
+// ==========================================
+
+async function enviarMensagem(texto) {
+
+    if (!texto || !texto.trim()) return;
+
+    adicionarMensagem(texto, "usuario");
+
+    // Primeiro verifica as respostas programadas.
+    // Isso mantém a prioridade das mensagens de segurança.
+
+    let resposta = responder(texto);
+
+    // Se não encontrou resposta programada,
+    // procura uma resposta no Supabase.
+
+    if (!resposta) {
+
+        adicionarMensagem(
+            "Estou procurando uma resposta para você... 💛",
+            "bot carregando"
+        );
+
+        try {
+
+            const respostaBanco = await buscarConhecimento(texto);
+
+            // Remove a mensagem temporária.
+            const carregando = mensagens.lastElementChild;
+
+            if (carregando) {
+                carregando.remove();
+            }
+
+            if (respostaBanco) {
+                resposta = respostaBanco;
+            }
+
+        } catch (erro) {
+
+            console.error("Erro na consulta:", erro);
+
+        }
+
+    }
+
+    // Se não encontrou resposta em nenhum lugar.
+
+    if (!resposta) {
+
+        resposta = `Ainda estou aprendendo a responder diferentes perguntas! 💛
 
 Tente perguntar de outra maneira ou escolha um destes assuntos:
 
@@ -381,35 +570,37 @@ Tente perguntar de outra maneira ou escolha um destes assuntos:
 • O que é Setembro Amarelo?
 
 Estou aqui para compartilhar informações educativas!`;
-}
 
-// ENVIAR MENSAGEM
-
-function enviarMensagem(texto) {
-
-    if (!texto.trim()) return;
-
-    adicionarMensagem(texto, "usuario");
-
-    const resposta = responder(texto);
+    }
 
     adicionarMensagem(resposta, "bot");
 }
 
-// FORMULÁRIO
+// ==========================================
+// 11. FORMULÁRIO
+// ==========================================
 
-formulario.addEventListener("submit", function(evento) {
+if (formulario && entrada) {
 
-    evento.preventDefault();
+    formulario.addEventListener("submit", async function(evento) {
 
-    enviarMensagem(entrada.value);
+        evento.preventDefault();
 
-    entrada.value = "";
-    entrada.focus();
+        const texto = entrada.value;
 
-});
+        entrada.value = "";
 
-// PERGUNTAS PRONTAS
+        await enviarMensagem(texto);
+
+        entrada.focus();
+
+    });
+
+}
+
+// ==========================================
+// 12. PERGUNTAS PRONTAS
+// ==========================================
 
 document.querySelectorAll(".pergunta-pronta").forEach(botao => {
 
@@ -420,3 +611,9 @@ document.querySelectorAll(".pergunta-pronta").forEach(botao => {
     });
 
 });
+
+// ==========================================
+// 13. INICIALIZAÇÃO
+// ==========================================
+
+carregarConhecimentos();
