@@ -2,33 +2,25 @@
 /* ==========================================
    ACOLHE+ 💛
    Assistente virtual de prevenção ao suicídio
-   Projeto Web pela Convivência
    Integração com Supabase
 ========================================== */
 
-// ==========================================
 // 1. CONEXÃO COM O SUPABASE
-// ==========================================
 
 const SUPABASE_URL = "https://ysblefnczwupjjkthgqc.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_QOuhlxo-Qis9S5OxkBh-2Q_t5xjeHEY";
 
 let banco = null;
 let conhecimentos = [];
 
-if (window.supabase) {
-    banco = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+if (window.supabase && window.supabase.createClient) {
+    banco = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log("Supabase conectado!");
 } else {
-    console.error("Biblioteca do Supabase não foi carregada.");
+    console.error("ERRO: biblioteca do Supabase não carregada.");
 }
 
-// ==========================================
 // 2. ELEMENTOS DO HTML
-// ==========================================
 
 const abrir = document.getElementById("abrir-assistente");
 const fechar = document.getElementById("fechar-assistente");
@@ -38,9 +30,7 @@ const mensagens = document.getElementById("mensagens-assistente");
 const formulario = document.getElementById("form-assistente");
 const entrada = document.getElementById("entrada-assistente");
 
-// ==========================================
 // 3. ABRIR E FECHAR O ASSISTENTE
-// ==========================================
 
 if (abrir && painel && entrada) {
     abrir.addEventListener("click", () => {
@@ -58,167 +48,151 @@ if (fechar && painel && abrir) {
     });
 }
 
-// ==========================================
 // 4. ADICIONAR MENSAGENS
-// ==========================================
 
 function adicionarMensagem(texto, tipo) {
+    if (!mensagens) {
+        console.error("ERRO: elemento mensagens-assistente não encontrado no HTML.");
+        return null;
+    }
 
     const mensagem = document.createElement("div");
-
-    mensagem.classList.add("mensagem", tipo);
+    mensagem.classList.add("mensagem", ...tipo.split(" "));
     mensagem.textContent = texto;
 
     mensagens.appendChild(mensagem);
-
     mensagens.scrollTop = mensagens.scrollHeight;
+
+    return mensagem;
 }
 
-// ==========================================
 // 5. NORMALIZAR TEXTO
-// ==========================================
 
 function normalizar(texto) {
-
-    return texto
+    return String(texto || "")
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/[^\w\s]/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 }
 
-// ==========================================
 // 6. IDENTIFICAR PALAVRAS
-// ==========================================
 
 function contem(texto, palavras) {
-
     return palavras.some(palavra =>
         texto.includes(normalizar(palavra))
     );
 }
 
-// ==========================================
 // 7. CARREGAR CONHECIMENTOS DO BANCO
-// ==========================================
 
 async function carregarConhecimentos() {
-
-    if (!banco) return;
-
-    const { data, error } = await banco
-        .from("conhecimentos")
-        .select("categoria, pergunta, resposta")
-        .limit(100);
-
-    if (error) {
-        console.error("Erro ao carregar conhecimentos:", error);
+    if (!banco) {
+        console.error("Não foi possível conectar ao Supabase.");
         return;
     }
 
-    conhecimentos = data || [];
+    try {
+        const { data, error } = await banco
+            .from("conhecimentos")
+            .select("categoria, pergunta, resposta")
+            .limit(100);
 
-    console.log(
-        "Conhecimentos carregados:",
-        conhecimentos.length
-    );
+        if (error) {
+            console.error("Erro ao carregar conhecimentos:", error);
+            return;
+        }
+
+        conhecimentos = data || [];
+
+        console.log("Conhecimentos carregados:", conhecimentos.length);
+        console.table(conhecimentos);
+
+    } catch (erro) {
+        console.error("Falha na conexão com o banco:", erro);
+    }
 }
 
-// ==========================================
+// Inicia o carregamento e guarda a promessa para aguardar depois.
+const carregamentoInicial = carregarConhecimentos();
+
 // 8. PESQUISAR NO BANCO DE DADOS
-// ==========================================
 
 async function buscarConhecimento(perguntaUsuario) {
+    // Garante que o carregamento inicial terminou.
+    await carregamentoInicial;
 
     if (!banco || conhecimentos.length === 0) {
+        console.warn("Nenhum conhecimento disponível no banco.");
         return null;
     }
 
     const pergunta = normalizar(perguntaUsuario);
 
     const ignorar = [
-        "como", "qual", "quais", "onde",
-        "quando", "porque", "para", "sobre",
-        "isso", "essa", "esse", "uma",
-        "que", "com", "dos", "das",
-        "estou", "quero", "voce"
+        "como", "qual", "quais", "onde", "quando",
+        "porque", "para", "sobre", "isso", "essa",
+        "esse", "uma", "que", "com", "dos", "das",
+        "estou", "quero", "voce", "o", "a", "os",
+        "as", "e", "de", "do", "da"
     ];
 
     const palavras = pergunta
-        .split(/\s+/)
+        .split(" ")
         .filter(palavra =>
-            palavra.length >= 3 &&
-            !ignorar.includes(palavra)
+            palavra.length >= 3 && !ignorar.includes(palavra)
         );
 
-    if (palavras.length === 0) {
-        return null;
-    }
+    if (palavras.length === 0) return null;
 
     let melhorResultado = null;
     let maiorPontuacao = 0;
 
     conhecimentos.forEach(item => {
-
-        const textoBanco = normalizar(
-            `${item.pergunta} ${item.categoria}`
-        );
+        const perguntaBanco = normalizar(item.pergunta);
+        const categoriaBanco = normalizar(item.categoria);
 
         let pontuacao = 0;
 
         palavras.forEach(palavra => {
-
-            if (textoBanco.includes(palavra)) {
-                pontuacao++;
+            // Palavras encontradas na pergunta cadastrada valem mais.
+            if (perguntaBanco.includes(palavra)) {
+                pontuacao += 2;
+            } else if (categoriaBanco.includes(palavra)) {
+                pontuacao += 1;
             }
-
         });
 
         if (pontuacao > maiorPontuacao) {
-
             maiorPontuacao = pontuacao;
             melhorResultado = item.resposta;
-
         }
-
     });
 
-    if (maiorPontuacao === 0) {
-        return null;
-    }
+    console.log("Pergunta recebida:", perguntaUsuario);
+    console.log("Palavras identificadas:", palavras);
+    console.log("Pontuação da busca:", maiorPontuacao);
 
-    return melhorResultado;
+    return maiorPontuacao > 0 ? melhorResultado : null;
 }
 
-// ==========================================
-// 9. RESPOSTAS PROGRAMADAS DO ACOLHE+
-// ==========================================
+// 9. RESPOSTAS PROGRAMADAS
 
 function responder(pergunta) {
-
     const texto = normalizar(pergunta);
 
-    // 1. POSSÍVEL SITUAÇÃO DE RISCO
+    // SITUAÇÕES DE RISCO
 
-    const sinaisDeRisco = [
-        "quero me matar",
-        "vou me matar",
-        "quero morrer",
-        "nao quero mais viver",
-        "tirar minha vida",
-        "acabar com minha vida",
-        "pensando em suicidio",
-        "estou pensando em morrer",
-        "quero acabar com tudo",
-        "vou tirar minha vida",
-        "quero me machucar",
-        "nao aguento mais viver",
-        "nao vejo motivo para viver"
-    ];
-
-    if (contem(texto, sinaisDeRisco)) {
-
+    if (contem(texto, [
+        "quero me matar", "vou me matar", "quero morrer",
+        "nao quero mais viver", "tirar minha vida",
+        "acabar com minha vida", "pensando em suicidio",
+        "estou pensando em morrer", "quero acabar com tudo",
+        "vou tirar minha vida", "quero me machucar",
+        "nao aguento mais viver", "nao vejo motivo para viver"
+    ])) {
         return `💛 Obrigado por compartilhar o que está sentindo.
 
 Sinto muito que você esteja passando por um momento tão difícil. Você merece ser ouvido(a), acolhido(a) e receber ajuda.
@@ -232,18 +206,14 @@ Por favor, procure agora uma pessoa de confiança, como um familiar, professor o
 Se você estiver pensando em se machucar, procure ajuda presencial imediatamente.
 
 Eu sou um assistente educativo e não substituo atendimento profissional ou de emergência. Sua vida importa!`;
-
     }
 
-    // 2. SAUDAÇÕES
+    // SAUDAÇÕES
 
     if (contem(texto, [
-        "oi", "ola", "bom dia",
-        "boa tarde", "boa noite",
-        "tudo bem", "quem e voce",
-        "seu nome"
+        "oi", "ola", "bom dia", "boa tarde",
+        "boa noite", "tudo bem", "quem e voce", "seu nome"
     ])) {
-
         return `Olá! 💛 Seja bem-vindo(a) ao Acolhe+!
 
 Sou o assistente virtual do projeto Prevenção ao Suicídio do 2 TDS do Colégio Dirce.
@@ -253,15 +223,12 @@ Estou aqui para compartilhar informações sobre saúde mental, prevenção e va
 E também para conversar contigo!`;
     }
 
-    // 3. O QUE É SUICÍDIO?
+    // SUICÍDIO
 
     if (contem(texto, [
-        "o que e suicidio",
-        "significado de suicidio",
-        "definicao de suicidio",
-        "sobre suicidio"
+        "o que e suicidio", "significado de suicidio",
+        "definicao de suicidio", "sobre suicidio"
     ])) {
-
         return `O suicídio é um fenômeno complexo e multifatorial, relacionado a diferentes fatores emocionais, sociais, psicológicos e também a situações de sofrimento.
 
 Não existe uma única causa.
@@ -271,18 +238,12 @@ Por isso, é importante falar sobre saúde mental, combater o preconceito e faci
 A prevenção é uma responsabilidade de toda a sociedade. 💛`;
     }
 
-    // 4. SAÚDE MENTAL
+    // SAÚDE MENTAL
 
     if (contem(texto, [
-        "saude mental",
-        "cuidar da mente",
-        "bem estar emocional",
-        "ansiedade",
-        "tristeza",
-        "estresse",
-        "emocional"
+        "saude mental", "cuidar da mente", "bem estar emocional",
+        "ansiedade", "tristeza", "estresse", "emocional"
     ])) {
-
         return `Cuidar da saúde mental é tão importante quanto cuidar da saúde física! 💛
 
 Algumas atitudes podem ajudar:
@@ -296,19 +257,13 @@ Algumas atitudes podem ajudar:
 Não é necessário enfrentar momentos difíceis sozinho(a).`;
     }
 
-    // 5. COMO AJUDAR ALGUÉM?
+    // COMO AJUDAR ALGUÉM
 
     if (contem(texto, [
-        "ajudar alguem",
-        "ajudar um amigo",
-        "meu amigo",
-        "minha amiga",
-        "pessoa triste",
-        "alguem sofrendo",
-        "como ajudar",
-        "amigo quer morrer"
+        "ajudar alguem", "ajudar um amigo", "meu amigo",
+        "minha amiga", "pessoa triste", "alguem sofrendo",
+        "como ajudar", "amigo quer morrer"
     ])) {
-
         return `Acolher alguém que está sofrendo pode fazer muita diferença!
 
 Você pode:
@@ -325,17 +280,13 @@ Se houver risco imediato, não deixe a pessoa sozinha e procure atendimento de e
 Lembre-se: você pode apoiar alguém, mas não precisa resolver tudo sozinho(a).`;
     }
 
-    // 6. SINAIS DE ALERTA
+    // SINAIS DE ALERTA
 
     if (contem(texto, [
-        "sinais de alerta",
-        "sinais de suicidio",
-        "como identificar",
-        "como perceber",
-        "sinais de sofrimento",
-        "mudancas de comportamento"
+        "sinais de alerta", "sinais de suicidio",
+        "como identificar", "como perceber",
+        "sinais de sofrimento", "mudancas de comportamento"
     ])) {
-
         return `Algumas mudanças podem indicar que alguém precisa de acolhimento:
 
 • Isolamento social.
@@ -350,17 +301,12 @@ Esses sinais não confirmam um diagnóstico, mas merecem atenção.
 O mais importante é ouvir, acolher e incentivar a procura por ajuda.`;
     }
 
-    // 7. PREVENÇÃO
+    // PREVENÇÃO
 
     if (contem(texto, [
-        "prevencao",
-        "prevenir",
-        "como evitar",
-        "combater o suicidio",
-        "como combater",
-        "valorizar a vida"
+        "prevencao", "prevenir", "como evitar",
+        "combater o suicidio", "como combater", "valorizar a vida"
     ])) {
-
         return `A prevenção ao suicídio envolve informação, acolhimento e acesso à ajuda!
 
 Algumas atitudes importantes:
@@ -375,22 +321,14 @@ Algumas atitudes importantes:
 Todos podemos contribuir para uma sociedade mais acolhedora! 💛`;
     }
 
-    // 8. AJUDA E CONTATOS
+    // AJUDA E CONTATOS
 
     if (contem(texto, [
-        "onde buscar ajuda",
-        "onde procurar ajuda",
-        "preciso de ajuda",
-        "telefone de ajuda",
-        "numero do cvv",
-        "cvv",
-        "caps",
-        "ubs",
-        "psicologo",
-        "psicologa",
-        "atendimento"
+        "onde buscar ajuda", "onde procurar ajuda",
+        "preciso de ajuda", "telefone de ajuda",
+        "numero do cvv", "cvv", "caps", "ubs",
+        "psicologo", "psicologa", "atendimento"
     ])) {
-
         return `Você não precisa enfrentar momentos difíceis sozinho(a). Existem serviços preparados para ajudar! 💛
 
 📞 CVV – 188
@@ -410,14 +348,11 @@ Você também pode procurar um professor, familiar ou adulto de confiança.
 Se houver perigo imediato, procure uma UPA ou pronto-socorro.`;
     }
 
-    // 9. SETEMBRO AMARELO
+    // SETEMBRO AMARELO
 
     if (contem(texto, [
-        "setembro amarelo",
-        "campanha amarela",
-        "mes de prevencao"
+        "setembro amarelo", "campanha amarela", "mes de prevencao"
     ])) {
-
         return `O Setembro Amarelo é uma campanha de conscientização sobre a prevenção ao suicídio.
 
 Seu objetivo é incentivar o diálogo, promover a valorização da vida e combater o preconceito relacionado à saúde mental.
@@ -425,16 +360,12 @@ Seu objetivo é incentivar o diálogo, promover a valorização da vida e combat
 Falar sobre o assunto com responsabilidade é uma forma de contribuir para a prevenção! 💛`;
     }
 
-    // 10. IMPORTÂNCIA DA ESCOLA
+    // ESCOLA
 
     if (contem(texto, [
-        "escola",
-        "professor",
-        "aluno",
-        "estudante",
-        "ambiente escolar"
+        "escola", "professor", "aluno",
+        "estudante", "ambiente escolar"
     ])) {
-
         return `A escola possui um papel muito importante na promoção da saúde mental!
 
 Ela pode:
@@ -448,15 +379,11 @@ Ela pode:
 Uma escola acolhedora pode contribuir para que ninguém se sinta sozinho(a). 💛`;
     }
 
-    // 11. BULLYING
+    // BULLYING
 
     if (contem(texto, [
-        "bullying",
-        "cyberbullying",
-        "perseguicao",
-        "humilhacao"
+        "bullying", "cyberbullying", "perseguicao", "humilhacao"
     ])) {
-
         return `O bullying pode causar sofrimento emocional e prejudicar a saúde mental.
 
 É importante:
@@ -470,14 +397,9 @@ Uma escola acolhedora pode contribuir para que ninguém se sinta sozinho(a). �
 Respeito e empatia ajudam a construir uma escola mais segura. 💛`;
     }
 
-    // 12. AGRADECIMENTOS
+    // AGRADECIMENTOS
 
-    if (contem(texto, [
-        "obrigado",
-        "obrigada",
-        "valeu"
-    ])) {
-
+    if (contem(texto, ["obrigado", "obrigada", "valeu"])) {
         return `Por nada! 💛
 
 Obrigado por conversar comigo.
@@ -485,15 +407,9 @@ Obrigado por conversar comigo.
 Lembre-se: ouvir, acolher e respeitar são atitudes que podem fazer a diferença na vida de alguém!`;
     }
 
-    // 13. DESPEDIDAS
+    // DESPEDIDAS
 
-    if (contem(texto, [
-        "tchau",
-        "ate mais",
-        "adeus",
-        "vou embora"
-    ])) {
-
+    if (contem(texto, ["tchau", "ate mais", "adeus", "vou embora"])) {
         return `Até mais! 💛
 
 Obrigado por conhecer nosso projeto.
@@ -501,63 +417,42 @@ Obrigado por conhecer nosso projeto.
 Lembre-se de que pedir ajuda não é sinal de fraqueza. Você merece cuidado e acolhimento!`;
     }
 
-    // Nenhuma resposta programada encontrada
-
     return null;
 }
 
-// ==========================================
-// 10. ENVIAR MENSAGEM E CONSULTAR O BANCO
-// ==========================================
+// 10. ENVIAR MENSAGEM
 
 async function enviarMensagem(texto) {
-
     if (!texto || !texto.trim()) return;
+
+    if (!mensagens) {
+        console.error("O chat não encontrou o elemento mensagens-assistente no HTML.");
+        return;
+    }
 
     adicionarMensagem(texto, "usuario");
 
-    // Primeiro verifica as respostas programadas.
-    // Isso mantém a prioridade das mensagens de segurança.
-
+    // Respostas de segurança e respostas programadas têm prioridade.
     let resposta = responder(texto);
 
-    // Se não encontrou resposta programada,
-    // procura uma resposta no Supabase.
-
     if (!resposta) {
-
-        adicionarMensagem(
+        const carregando = adicionarMensagem(
             "Estou procurando uma resposta para você... 💛",
             "bot carregando"
         );
 
         try {
-
-            const respostaBanco = await buscarConhecimento(texto);
-
-            // Remove a mensagem temporária.
-            const carregando = mensagens.lastElementChild;
-
+            resposta = await buscarConhecimento(texto);
+        } catch (erro) {
+            console.error("Erro ao pesquisar no banco:", erro);
+        } finally {
             if (carregando) {
                 carregando.remove();
             }
-
-            if (respostaBanco) {
-                resposta = respostaBanco;
-            }
-
-        } catch (erro) {
-
-            console.error("Erro na consulta:", erro);
-
         }
-
     }
 
-    // Se não encontrou resposta em nenhum lugar.
-
     if (!resposta) {
-
         resposta = `Ainda estou aprendendo a responder diferentes perguntas! 💛
 
 Tente perguntar de outra maneira ou escolha um destes assuntos:
@@ -570,50 +465,41 @@ Tente perguntar de outra maneira ou escolha um destes assuntos:
 • O que é Setembro Amarelo?
 
 Estou aqui para compartilhar informações educativas!`;
-
     }
 
     adicionarMensagem(resposta, "bot");
 }
 
-// ==========================================
 // 11. FORMULÁRIO
-// ==========================================
 
 if (formulario && entrada) {
-
     formulario.addEventListener("submit", async function(evento) {
-
         evento.preventDefault();
 
-        const texto = entrada.value;
+        const texto = entrada.value.trim();
+
+        if (!texto) return;
 
         entrada.value = "";
-
         await enviarMensagem(texto);
-
         entrada.focus();
-
     });
-
+} else {
+    console.error("ERRO: formulário ou campo de entrada não encontrado. Confira os IDs no HTML.");
 }
 
-// ==========================================
 // 12. PERGUNTAS PRONTAS
-// ==========================================
 
 document.querySelectorAll(".pergunta-pronta").forEach(botao => {
-
     botao.addEventListener("click", function() {
-
         enviarMensagem(botao.textContent);
-
     });
-
 });
 
-// ==========================================
-// 13. INICIALIZAÇÃO
-// ==========================================
+// 13. CONFERÊNCIA FINAL
 
-carregarConhecimentos();
+console.log("Acolhe+ inicializado.");
+
+if (!mensagens) {
+    console.error("Confira se existe id='mensagens-assistente' no HTML.");
+}
