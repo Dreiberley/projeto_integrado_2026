@@ -1,3 +1,111 @@
+/* ABA LATERAL DO ACOLHE+ */
+
+#abrir-assistente {
+    position: fixed;
+
+    left: 0;
+    top: calc(45% - 20px);
+
+    z-index: 11000;
+
+    background: linear-gradient(135deg, #fff176, #fbc02d);
+    color: #1a1a1a;
+
+    border: 2px solid #d9a514;
+    border-left: none;
+
+    border-radius: 0 12px 12px 0;
+
+    padding: 18px 12px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.15);
+
+    transition: 0.3s;
+}
+
+#abrir-assistente:hover {
+    background: #fbc02d;
+    padding-left: 17px;
+}
+
+/* JANELA DO CHAT NA LATERAL ESQUERDA */
+
+#painel-assistente {
+    position: fixed;
+
+    top: 50%;
+    left: 65px;
+
+    transform: translateY(-50%);
+
+    z-index: 11001;
+
+    width: min(360px, calc(100vw - 85px));
+    height: min(540px, calc(100vh - 30px));
+
+    background: #ffffff;
+
+    border: 2px solid #fbc02d;
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+#painel-assistente[hidden] {
+    display: none;
+}
+
+/* CELULAR */
+
+@media (max-width: 600px) {
+
+    #abrir-assistente {
+        top: 40%;
+        padding: 14px 9px;
+        font-size: 13px;
+    }
+
+    #painel-assistente {
+        left: 48px;
+        width: calc(100vw - 60px);
+        height: min(540px, calc(100vh - 30px));
+    }
+
+}
+
+/* AJUSTES COMPLEMENTARES */
+
+/* Preserva as quebras de linha das mensagens */
+.mensagem {
+    white-space: pre-line;
+}
+
+/* Aparência dos botões durante o envio */
+button:disabled,
+input[type="submit"]:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+/* Resultado do formulário de contato */
+#resultado-contato {
+    margin-top: 12px;
+    font-weight: 650;
+}
+
 /* BOTÃO DO ACOLHE+ NO LADO ESQUERDO */
 
 #abrir-assistente {
@@ -68,5 +176,320 @@
         bottom: 80px;
         width: calc(100vw - 20px);
         max-width: none;
+    }
+}
+
+
+/* =====================================================
+   PÁGINA / PAINEL DO ASSISTENTE VIRTUAL ACOLHE+
+   Identidade visual do Projeto Setembro Amarelo
+   ===================================================== */
+
+/* Painel principal */
+#painel-assistente {
+    position: fixed;
+    left: 25px;
+    right: auto;
+    bottom: 90px;
+    z-index: 11000;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 370px;
+    max-width: calc(100vw - 30px);
+    max-height: 75vh;
+
+    overflow: hidden;
+
+    background-color: #ffffff;
+    border: 1px solid #fff59d;
+    border-radius: 18px;
+
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+
+    animation: aparecerAcolhe 0.3s ease;
+}
+
+/* Animação de abertura */
+@keyframes aparecerAcolhe {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título e identificação do assistente */
+#painel-assistente h2 {
+    margin: 0;
+    padding: 20px;
+
+    background: linear-gradient(
+        135deg,
+        #fff176,
+        #fbc02d
+    );
+
+    color: #1c1c1c;
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+#painel-assistente h2::after {
+    display: none;
+}
+
+/* Texto de apresentação */
+#painel-assistente > p {
+    margin: 0;
+    padding: 13px 18px;
+
+    background-color: #fffde7;
+
+    color: #444444;
+    text-align: center;
+    font-size: 0.92rem;
+}
+
+/* Botão para fechar o assistente */
+#fechar-assistente {
+    align-self: flex-end;
+    margin: 10px 12px 0;
+    padding: 7px 13px;
+
+    background-color: #fff176;
+    color: #1c1c1c;
+
+    border: 1px solid #fbc02d;
+    border-radius: 8px;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#fechar-assistente:hover {
+    background-color: #fbc02d;
+    transform: scale(1.04);
+}
+
+/* Área das mensagens */
+#mensagens-assistente {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    min-height: 180px;
+    max-height: 350px;
+
+    overflow-y: auto;
+
+    padding: 18px;
+
+    background-color: #fffdf7;
+    scroll-behavior: smooth;
+}
+
+/* Estilo geral das mensagens */
+.mensagem {
+    max-width: 88%;
+    width: fit-content;
+
+    padding: 12px 15px;
+
+    border-radius: 14px;
+
+    font-size: 0.94rem;
+    line-height: 1.55;
+
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+/* Mensagens do assistente */
+.mensagem.bot {
+    align-self: flex-start;
+
+    background-color: #fff3bf;
+    color: #333333;
+
+    border: 1px solid #f2d77b;
+
+    border-bottom-left-radius: 4px;
+}
+
+/* Mensagens do usuário */
+.mensagem.usuario {
+    align-self: flex-end;
+
+    background-color: #52796f;
+    color: #ffffff;
+
+    border: 1px solid #42675d;
+
+    border-bottom-right-radius: 4px;
+}
+
+/* Formulário de envio */
+#form-assistente {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 14px;
+
+    background-color: #ffffff;
+    border-top: 1px solid #eeeeee;
+}
+
+/* Campo de digitação */
+#entrada-assistente {
+    flex: 1;
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    background-color: #ffffff;
+    color: #222222;
+
+    border: 1px solid #dddddd;
+    border-radius: 25px;
+
+    font-size: 0.95rem;
+    outline: none;
+
+    transition: 0.25s ease;
+}
+
+#entrada-assistente:focus {
+    border-color: #fbc02d;
+    box-shadow: 0 0 0 3px rgba(251, 192, 45, 0.2);
+}
+
+/* Botão de enviar mensagem */
+#form-assistente button {
+    flex-shrink: 0;
+
+    padding: 11px 17px;
+
+    background: linear-gradient(
+        135deg,
+        #fff176,
+        #fbc02d
+    );
+
+    color: #1c1c1c;
+
+    border: none;
+    border-radius: 25px;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#form-assistente button:hover {
+    background: #fbc02d;
+    transform: translateY(-2px);
+}
+
+/* Botão que abre o Acolhe+ */
+#abrir-assistente {
+    position: fixed;
+    left: 25px;
+    right: auto;
+    bottom: 22px;
+
+    z-index: 11001;
+
+    padding: 14px 22px;
+
+    background: linear-gradient(
+        135deg,
+        #fff176,
+        #fbc02d
+    );
+
+    color: #1c1c1c;
+
+    border: 1px solid #e4b52c;
+    border-radius: 30px;
+
+    font-size: 1rem;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.17);
+
+    transition: all 0.25s ease;
+}
+
+#abrir-assistente:hover {
+    background: #fbc02d;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* Barra de rolagem das mensagens */
+#mensagens-assistente::-webkit-scrollbar {
+    width: 7px;
+}
+
+#mensagens-assistente::-webkit-scrollbar-thumb {
+    background-color: #e7c85e;
+    border-radius: 10px;
+}
+
+#mensagens-assistente::-webkit-scrollbar-track {
+    background-color: #fff9df;
+}
+
+/* Acessibilidade pelo teclado */
+#abrir-assistente:focus-visible,
+#fechar-assistente:focus-visible,
+#form-assistente button:focus-visible {
+    outline: 3px solid #174a7e;
+    outline-offset: 3px;
+}
+
+/* Adaptação para celulares */
+@media (max-width: 600px) {
+    #painel-assistente {
+        left: 10px;
+        right: 10px;
+        bottom: 78px;
+
+        width: auto;
+        max-width: none;
+        max-height: 72vh;
+    }
+
+    #mensagens-assistente {
+        max-height: 42vh;
+    }
+
+    #abrir-assistente {
+        left: 15px;
+        bottom: 15px;
+        padding: 12px 18px;
+        font-size: 0.92rem;
+    }
+
+    #form-assistente {
+        gap: 6px;
+        padding: 10px;
+    }
+
+    #form-assistente button {
+        padding: 10px 13px;
     }
 }
