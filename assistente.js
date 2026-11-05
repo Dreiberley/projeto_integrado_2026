@@ -88,16 +88,12 @@ function responder(pergunta) {
 
     if (contem(texto, sinaisDeRisco)) {
 
-        return `💛 Obrigado por compartilhar o que está sentindo.
+        return `💛 Obrigado por compartilhar o que está sentindo, amigo(a).
 
 Sinto muito que você esteja passando por um momento tão difícil. Você merece ser ouvido(a), acolhido(a) e receber ajuda.
 
 Por favor, não enfrente isso sozinho(a).
-
-• Procure imediatamente alguém de confiança e conte o que está acontecendo.
-• Se houver risco de você se machucar, fique perto de outra pessoa e procure uma UPA ou pronto-socorro.
-• Em uma emergência médica, ligue para o SAMU: 192.
-• Você também pode conversar gratuitamente com o CVV: 188, disponível 24 horas.
+Procure
 
 Se puder, procure ajuda agora. Sua vida importa. 💛
 
@@ -116,11 +112,11 @@ Eu sou apenas um assistente educativo e não consigo oferecer atendimento de eme
 
         return `Olá! 💛 Seja bem-vindo(a) ao Acolhe+!
 
-Sou o assistente virtual do projeto Prevenção ao Suicídio.
+Sou o assistente virtual do projeto Prevenção ao Suicídio do 2 TDS do colégio Dirce.
 
 Estou aqui para compartilhar informações sobre saúde mental, prevenção e valorização da vida.
 
-Pode conversar comigo!`;
+E também para conversar contigo!`;
     }
 
     // 3. O QUE É SUICÍDIO?
@@ -179,7 +175,7 @@ Não é necessário enfrentar momentos difíceis sozinho(a).`;
         "amigo quer morrer"
     ])) {
 
-        return `Acolher alguém que está sofrendo pode fazer muita diferença! 💛
+        return `Acolher alguém que está sofrendo pode fazer muita diferença!
 
 Você pode:
 
