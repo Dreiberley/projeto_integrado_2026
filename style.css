@@ -1066,3 +1066,92 @@ a:focus-visible {
         text-align: center;
     }
 }
+
+
+/* ABA LATERAL DO ACOLHE+ */
+
+#abrir-assistente {
+    position: fixed;
+
+    left: 0;
+    top: 45%;
+
+    z-index: 11000;
+
+    background: linear-gradient(135deg, #fff176, #fbc02d);
+    color: #1a1a1a;
+
+    border: 2px solid #d9a514;
+    border-left: none;
+
+    border-radius: 0 12px 12px 0;
+
+    padding: 18px 12px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.15);
+
+    transition: 0.3s;
+}
+
+#abrir-assistente:hover {
+    background: #fbc02d;
+    padding-left: 17px;
+}
+
+/* JANELA DO CHAT NA LATERAL ESQUERDA */
+
+#painel-assistente {
+    position: fixed;
+
+    top: 50%;
+    left: 65px;
+
+    transform: translateY(-50%);
+
+    z-index: 11001;
+
+    width: min(360px, calc(100vw - 85px));
+    height: min(540px, calc(100vh - 30px));
+
+    background: #ffffff;
+
+    border: 2px solid #fbc02d;
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+#painel-assistente[hidden] {
+    display: none;
+}
+
+/* CELULAR */
+
+@media (max-width: 600px) {
+
+    #abrir-assistente {
+        top: 40%;
+        padding: 14px 9px;
+        font-size: 13px;
+    }
+
+    #painel-assistente {
+        left: 48px;
+        width: calc(100vw - 60px);
+        height: min(540px, calc(100vh - 30px));
+    }
+
+}
