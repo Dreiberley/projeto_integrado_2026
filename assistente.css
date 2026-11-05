@@ -1,104 +1,78 @@
 
 /* ==========================================
-   ACOLHE+ - ASSISTENTE VIRTUAL
-   CENTRALIZADO NA PÁGINA
+   ACOLHE+ - CHAT CENTRALIZADO NA PÁGINA
 ========================================== */
 
-/* BOTÃO PARA ABRIR O ASSISTENTE */
+/* REMOVE O BOTÃO DE ABRIR */
 
 #abrir-assistente {
-    position: fixed;
-
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
-    z-index: 11000;
-
-    padding: 20px 35px;
-
-    background: linear-gradient(135deg, #fff176, #fbc02d);
-    color: #1a1a1a;
-
-    border: 2px solid #d9a514;
-    border-radius: 18px;
-
-    font-size: 20px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    box-shadow: 0 5px 18px rgba(0,0,0,0.15);
-
-    transition: background 0.3s, box-shadow 0.3s;
+    display: none !important;
 }
 
-/* EFEITO DO BOTÃO */
-
-#abrir-assistente:hover {
-    background: #fbc02d;
-    box-shadow: 0 7px 22px rgba(0,0,0,0.20);
-}
-
-/* JANELA PRINCIPAL DO CHAT */
+/* MOLDURA PRINCIPAL DO CHAT */
 
 #painel-assistente {
-    position: fixed;
+    position: relative;
 
-    top: 50%;
-    left: 50%;
+    display: flex !important;
+    flex-direction: column;
 
-    transform: translate(-50%, -50%);
+    width: 500px;
+    max-width: 95%;
 
-    z-index: 11001;
+    height: 650px;
+    max-height: 85vh;
 
-    width: 450px;
-    max-width: calc(100vw - 30px);
-
-    height: 620px;
-    max-height: calc(100vh - 30px);
+    margin: 35px auto;
 
     background: #ffffff;
 
-    border: 2px solid #fbc02d;
+    border: 3px solid #fbc02d;
     border-radius: 20px;
-
-    display: flex;
-    flex-direction: column;
 
     overflow: hidden;
 
-    box-shadow: 0 8px 30px rgba(0,0,0,0.20);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
 
-/* ESCONDER O CHAT QUANDO FECHADO */
-
-#painel-assistente[hidden] {
-    display: none;
-}
-
-/* CABEÇALHO DO CHAT */
+/* CABEÇALHO E ABA DO MENU */
 
 #painel-assistente h2 {
     background: linear-gradient(135deg, #fff176, #fbc02d);
+
     color: #1a1a1a;
 
     text-align: center;
 
-    padding: 18px;
+    padding: 22px;
     margin: 0;
 
-    font-size: 23px;
+    font-size: 24px;
 }
 
-/* TEXTO INICIAL */
+/* BOTÃO FECHAR */
+
+#fechar-assistente {
+    background: #fbc02d;
+    color: #1a1a1a;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 8px 14px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* TEXTO DE APRESENTAÇÃO */
 
 #painel-assistente p {
     padding: 12px 18px;
     margin: 0;
 
     background: #fffde7;
+
     color: #333333;
 
     text-align: center;
@@ -122,7 +96,7 @@
     background: #fafafa;
 }
 
-/* MENSAGENS DO CHAT */
+/* MENSAGENS */
 
 .mensagem {
     max-width: 85%;
@@ -135,7 +109,6 @@
     line-height: 1.5;
 
     white-space: pre-line;
-
     overflow-wrap: anywhere;
 }
 
@@ -161,7 +134,7 @@
     border-bottom-right-radius: 4px;
 }
 
-/* FORMULÁRIO DE ENVIO */
+/* FORMULÁRIO */
 
 #form-assistente {
     display: flex;
@@ -179,7 +152,6 @@
 
 #entrada-assistente {
     flex: 1;
-
     min-width: 0;
 
     padding: 13px;
@@ -197,7 +169,7 @@
     box-shadow: 0 0 5px rgba(251,192,45,0.4);
 }
 
-/* BOTÃO DE ENVIAR */
+/* BOTÃO ENVIAR */
 
 #form-assistente button {
     padding: 12px 20px;
@@ -209,30 +181,11 @@
     color: #1a1a1a;
 
     font-weight: bold;
-
     cursor: pointer;
-
-    transition: background 0.3s;
 }
 
 #form-assistente button:hover {
     background: #e5b832;
-}
-
-/* BOTÃO DE FECHAR */
-
-#fechar-assistente {
-    background: #fbc02d;
-    color: #1a1a1a;
-
-    border: none;
-    border-radius: 8px;
-
-    padding: 8px 13px;
-
-    font-weight: bold;
-
-    cursor: pointer;
 }
 
 /* BARRA DE ROLAGEM */
@@ -246,19 +199,16 @@
     border-radius: 10px;
 }
 
-/* RESPONSIVIDADE */
+/* CELULARES */
 
 @media (max-width: 600px) {
 
-    #abrir-assistente {
-        padding: 16px 25px;
-        font-size: 17px;
-    }
-
     #painel-assistente {
-        width: calc(100vw - 24px);
-        height: 580px;
-        max-height: calc(100vh - 24px);
+        width: 95%;
+        height: 600px;
+        max-height: 85vh;
+
+        margin: 20px auto;
     }
 
     .mensagem {

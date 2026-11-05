@@ -18,7 +18,6 @@ const entrada = document.getElementById("entrada-assistente");
 // ABRIR O ASSISTENTE
 
 abrir.addEventListener("click", () => {
-    painel.hidden = false;
     abrir.setAttribute("aria-expanded", "true");
     entrada.focus();
 });
