@@ -1068,13 +1068,15 @@ a:focus-visible {
 }
 
 
+
+
 /* ABA LATERAL DO ACOLHE+ */
 
 #abrir-assistente {
     position: fixed;
 
     left: 0;
-    top: 45%;
+    top: calc(45% - 20px);
 
     z-index: 11000;
 
