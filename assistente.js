@@ -48,11 +48,11 @@ if (fechar && painel && abrir) {
     });
 }
 
-// 4. ADICIONAR MENSAGENS
+// 4. ADICIONAR MENSAGENS NA TELA
 
 function adicionarMensagem(texto, tipo) {
     if (!mensagens) {
-        console.error("ERRO: elemento mensagens-assistente não encontrado no HTML.");
+        console.error("Elemento mensagens-assistente não encontrado.");
         return null;
     }
 
@@ -86,11 +86,76 @@ function contem(texto, palavras) {
     );
 }
 
-// 7. CARREGAR CONHECIMENTOS DO BANCO
+// 7. CRIAR CONVERSAS E SALVAR MENSAGENS
+
+let conversaAtualId = null;
+
+async function obterOuCriarConversa() {
+    if (!banco) return null;
+
+    if (conversaAtualId) {
+        return conversaAtualId;
+    }
+
+    try {
+        const novoId = crypto.randomUUID();
+
+        const { error } = await banco
+            .from("conversas")
+            .insert({ id: novoId });
+
+        if (error) {
+            console.error("Erro ao criar conversa:", error);
+            return null;
+        }
+
+        conversaAtualId = novoId;
+
+        console.log("Conversa criada:", conversaAtualId);
+
+        return conversaAtualId;
+
+    } catch (erro) {
+        console.error("Falha ao criar conversa:", erro);
+        return null;
+    }
+}
+
+async function salvarMensagem(remetente, texto) {
+    if (!banco) return;
+
+    const conversaId = await obterOuCriarConversa();
+
+    if (!conversaId) {
+        console.warn("Não foi possível salvar a mensagem.");
+        return;
+    }
+
+    try {
+        const { error } = await banco
+            .from("mensagens")
+            .insert({
+                conversa_id: conversaId,
+                remetente: remetente,
+                mensagem: texto
+            });
+
+        if (error) {
+            console.error("Erro ao salvar mensagem:", error);
+        } else {
+            console.log("Mensagem salva:", remetente);
+        }
+
+    } catch (erro) {
+        console.error("Falha ao salvar mensagem:", erro);
+    }
+}
+
+// 8. CARREGAR CONHECIMENTOS DO SUPABASE
 
 async function carregarConhecimentos() {
     if (!banco) {
-        console.error("Não foi possível conectar ao Supabase.");
+        console.error("Supabase não conectado.");
         return;
     }
 
@@ -108,24 +173,20 @@ async function carregarConhecimentos() {
         conhecimentos = data || [];
 
         console.log("Conhecimentos carregados:", conhecimentos.length);
-        console.table(conhecimentos);
 
     } catch (erro) {
-        console.error("Falha na conexão com o banco:", erro);
+        console.error("Falha ao carregar conhecimentos:", erro);
     }
 }
 
-// Inicia o carregamento e guarda a promessa para aguardar depois.
 const carregamentoInicial = carregarConhecimentos();
 
-// 8. PESQUISAR NO BANCO DE DADOS
+// 9. PESQUISAR RESPOSTAS NO BANCO
 
 async function buscarConhecimento(perguntaUsuario) {
-    // Garante que o carregamento inicial terminou.
     await carregamentoInicial;
 
     if (!banco || conhecimentos.length === 0) {
-        console.warn("Nenhum conhecimento disponível no banco.");
         return null;
     }
 
@@ -157,7 +218,6 @@ async function buscarConhecimento(perguntaUsuario) {
         let pontuacao = 0;
 
         palavras.forEach(palavra => {
-            // Palavras encontradas na pergunta cadastrada valem mais.
             if (perguntaBanco.includes(palavra)) {
                 pontuacao += 2;
             } else if (categoriaBanco.includes(palavra)) {
@@ -172,13 +232,12 @@ async function buscarConhecimento(perguntaUsuario) {
     });
 
     console.log("Pergunta recebida:", perguntaUsuario);
-    console.log("Palavras identificadas:", palavras);
-    console.log("Pontuação da busca:", maiorPontuacao);
+    console.log("Pontuação:", maiorPontuacao);
 
     return maiorPontuacao > 0 ? melhorResultado : null;
 }
 
-// 9. RESPOSTAS PROGRAMADAS
+// 10. RESPOSTAS PROGRAMADAS
 
 function responder(pergunta) {
     const texto = normalizar(pergunta);
@@ -420,21 +479,24 @@ Lembre-se de que pedir ajuda não é sinal de fraqueza. Você merece cuidado e a
     return null;
 }
 
-// 10. ENVIAR MENSAGEM
+// 11. ENVIAR E REGISTRAR MENSAGENS
 
 async function enviarMensagem(texto) {
     if (!texto || !texto.trim()) return;
 
     if (!mensagens) {
-        console.error("O chat não encontrou o elemento mensagens-assistente no HTML.");
+        console.error("Elemento mensagens-assistente não encontrado.");
         return;
     }
 
+    // Mostra e salva a mensagem do usuário.
     adicionarMensagem(texto, "usuario");
+    await salvarMensagem("usuario", texto);
 
-    // Respostas de segurança e respostas programadas têm prioridade.
+    // Primeiro verifica as respostas de segurança e programadas.
     let resposta = responder(texto);
 
+    // Se não encontrar, procura no Supabase.
     if (!resposta) {
         const carregando = adicionarMensagem(
             "Estou procurando uma resposta para você... 💛",
@@ -452,6 +514,7 @@ async function enviarMensagem(texto) {
         }
     }
 
+    // Resposta padrão quando não encontrar correspondência.
     if (!resposta) {
         resposta = `Ainda estou aprendendo a responder diferentes perguntas! 💛
 
@@ -467,10 +530,12 @@ Tente perguntar de outra maneira ou escolha um destes assuntos:
 Estou aqui para compartilhar informações educativas!`;
     }
 
+    // Mostra e salva a resposta do Acolhe+.
     adicionarMensagem(resposta, "bot");
+    await salvarMensagem("assistente", resposta);
 }
 
-// 11. FORMULÁRIO
+// 12. FORMULÁRIO DE ENVIO
 
 if (formulario && entrada) {
     formulario.addEventListener("submit", async function(evento) {
@@ -481,14 +546,18 @@ if (formulario && entrada) {
         if (!texto) return;
 
         entrada.value = "";
+
         await enviarMensagem(texto);
+
         entrada.focus();
     });
 } else {
-    console.error("ERRO: formulário ou campo de entrada não encontrado. Confira os IDs no HTML.");
+    console.error(
+        "ERRO: formulário ou campo de entrada não encontrado. Confira os IDs no HTML."
+    );
 }
 
-// 12. PERGUNTAS PRONTAS
+// 13. PERGUNTAS PRONTAS
 
 document.querySelectorAll(".pergunta-pronta").forEach(botao => {
     botao.addEventListener("click", function() {
@@ -496,9 +565,9 @@ document.querySelectorAll(".pergunta-pronta").forEach(botao => {
     });
 });
 
-// 13. CONFERÊNCIA FINAL
+// 14. CONFERÊNCIA FINAL
 
-console.log("Acolhe+ inicializado.");
+console.log("Acolhe+ inicializado!");
 
 if (!mensagens) {
     console.error("Confira se existe id='mensagens-assistente' no HTML.");
