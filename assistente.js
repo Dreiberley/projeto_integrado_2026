@@ -383,8 +383,7 @@ Todos podemos contribuir para uma sociedade mais acolhedora! 💛`;
     }
 
     if (contem(texto, [
-        "onde buscar ajuda", "onde procurar ajuda",
-        "preciso de ajuda", "telefone de ajuda",
+         "telefone de ajuda",
         "numero do cvv", "cvv", "caps", "ubs",
         "psicologo", "psicologa", "atendimento"
     ])) {
