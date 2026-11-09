@@ -291,10 +291,7 @@ Eu sou um assistente educativo e não substituo atendimento profissional ou de e
         return `Olá! 💛 Seja bem-vindo(a) ao Acolhe+!
 
 Sou o assistente virtual do projeto Prevenção ao Suicídio do 2 TDS do Colégio Dirce.
-
-Estou aqui para compartilhar informações sobre saúde mental, prevenção e valorização da vida.
-
-E também para conversar contigo!`;
+Estou aqui para compartilhar informações sobre o nosso projeto e também para conversar contigo!`;
     }
 
     if (contem(texto, [
