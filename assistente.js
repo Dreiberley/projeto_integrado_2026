@@ -497,18 +497,13 @@ async function enviarMensagem(texto) {
     if (!resposta) {
         await registrarPerguntaParaAprendizado(texto);
 
-        resposta = `Ainda estou aprendendo a responder diferentes perguntas! 💛
+        resposta = `Ainda estou aprendendo a responder algumas coisas! 💛
 
-Tente perguntar de outra maneira ou escolha um destes assuntos:
-
-• O que é prevenção ao suicídio?
-• Como cuidar da saúde mental?
-• Como ajudar alguém?
-• Quais são os sinais de alerta?
-• Onde procurar ajuda?
-• O que é Setembro Amarelo?
-
-Estou aqui para compartilhar informações educativas!`;
+    Me desculpe por não conseguir te ajudar nessa questão, se você se sentir confortável
+    pode entrar em contato para reclamar sobre esse erro, ou se preferir ajuda humanizada,
+    estamos dispostos a ajudar do mesmo jeito! 
+    
+        Novamente peço perdão pela minha falta de conhecimento...`;
     }
 
     adicionarMensagem(resposta, "bot");
